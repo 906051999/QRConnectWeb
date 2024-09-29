@@ -1,12 +1,12 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import WiFiConnector from '../../components/WiFiConnector';
 import { decodeWiFiInfo, setLogCallback } from '@/lib/utils';
 import Ad from '../../components/Gap';
 
-export default function Connect() {
+function ConnectContent() {
   const searchParams = useSearchParams();
   const encodedInfo = searchParams.get('info');
   const [wifiInfo, setWifiInfo] = useState(null);
@@ -121,5 +121,13 @@ export default function Connect() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Connect() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ConnectContent />
+    </Suspense>
   );
 }
