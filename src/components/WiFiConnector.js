@@ -1,22 +1,13 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import jsQR from 'jsqr';
-import { forwardRef } from 'react';
-
-const ForwardedQRCodeSVG = forwardRef((props, ref) => (
-  <QRCodeSVG {...props} ref={ref} />
-));
 
 export default function WiFiConnector({ ssid, password, encryptionType, isHidden }) {
   const [status, setStatus] = useState('准备连接');
   const [scanLog, setScanLog] = useState('');
-  const qrRef = useRef(null);
-  const [qrSvg, setQrSvg] = useState(null);
 
   useEffect(() => {
-    console.log('Component mounted');
     setScanLog('组件已加载');
   }, []);
 
@@ -32,7 +23,6 @@ export default function WiFiConnector({ ssid, password, encryptionType, isHidden
   ), []);
 
   const connectToWifi = useCallback(() => {
-    // 这里我们只能提供指导，无法直接连接
     setStatus('请手动连接到WiFi');
     setScanLog(`
       请按照以下步骤连接WiFi：
@@ -41,7 +31,7 @@ export default function WiFiConnector({ ssid, password, encryptionType, isHidden
       3. 输入密码: ${password}
       4. 点击连接
     `);
-  }, [ssid, password, setStatus, setScanLog]);
+  }, [ssid, password]);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -53,7 +43,7 @@ export default function WiFiConnector({ ssid, password, encryptionType, isHidden
         <div className="text-center text-gray-600">{status}</div>
       </div>
       <div className="mt-6 flex justify-center">
-        <ForwardedQRCodeSVG ref={qrRef} value={wifiString} size={200} />
+        <QRCodeSVG value={wifiString} size={200} />
       </div>
       <div className="mt-6 space-y-4">
         <button

@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const Ad = () => {
   const [adContent, setAdContent] = useState(null);
   const [showContact, setShowContact] = useState(false);
+  const [randomImageSeed, setRandomImageSeed] = useState(Math.random());
 
   const defaultAd = {
     title: "默认广告",
     description: "这是一个默认广告，当无法从API获取广告时显示。",
     cta: "了解更多",
-    image: "https://picsum.photos/300/200?random=1"
+    image: `https://picsum.photos/300/200?random=${randomImageSeed}`
   };
 
   useEffect(() => {
@@ -47,7 +49,15 @@ const Ad = () => {
   return (
     <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-6 rounded-xl shadow-lg my-6 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-300 rounded-bl-full transform rotate-45 -translate-x-10 -translate-y-10"></div>
-      <img src={currentAd.image} alt={currentAd.title} className="w-full h-48 object-cover rounded-lg mb-4 shadow-md" />
+      <div className="relative w-full h-48 mb-4">
+        <Image
+          src={currentAd.image}
+          alt={currentAd.title}
+          layout="fill"
+          objectFit="cover"
+          className="rounded-lg shadow-md"
+        />
+      </div>
       <h3 className="text-2xl font-bold text-gray-800 mb-3">{currentAd.title}</h3>
       <p className="text-md text-gray-600 mb-4 leading-relaxed">{currentAd.description}</p>
       <button

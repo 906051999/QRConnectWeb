@@ -13,7 +13,7 @@ export default function Connect() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAd, setShowAd] = useState(true);
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(Math.floor(Math.random() * 5) + 3);
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
