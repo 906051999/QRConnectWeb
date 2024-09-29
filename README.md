@@ -1,8 +1,9 @@
 # QRConnectWeb
+> 暂时无法实现扫码跳转网页后自动连接WiFi
+> 
 QRConnectWeb 不依赖数据库存储信息，通过特殊编码将 WiFi 信息编码到 URL 中，生成对应的二维码，扫描二维码后即可在连接页面中解码获取 WiFi 信息，然后一键自动连接该 WiFi。
 
 - 项目使用 Next.js 框架开发
-- 使用 vercel 进行部署
 
 ## 功能介绍
 直接访问网站，即可进入二维码生成页面；如果带参数访问，则进入连接页面。
@@ -14,10 +15,11 @@ QRConnectWeb 不依赖数据库存储信息，通过特殊编码将 WiFi 信息�
 
 2. 连接：
     - 扫描Connect二维码，即可跳转连接页面
-    - 此时将自动解码URL中的WiFi信息
-    - 成功后点击“连接”按钮，即可自动连接到对应的Wi-Fi网络
+    - 此时将自动解码URL中的WiFi信息，生成标准的WiFi二维码
+    - 点击“连接”按钮，调用相机扫描网页上的WIFI二维码
+    - 扫描成功后，跳出WIFI连接页面，点击连接即可
 
-## WIFI 连接原理
+## WIFI二维码连接原理
 
 本项目使用标准的 WIFI 连接协议格式：
 
@@ -44,5 +46,36 @@ WIFI:T:WPA;S:MyHomeWiFi;P:mypassword123;;
 5. 设备自动执行 WiFi 连接操作
 
 注意：具体连接过程可能因设备和操作系统而异。
+
+
+## 测试步骤
+1. npm install
+2. 为了使用HTTPS测试，需要生成证书:
+- 安装 mkcert：
+```bash
+# macOS
+brew install mkcert
+
+# Windows (使用管理员权限的 PowerShell)
+choco install mkcert
+```
+- 安装本地 CA：
+```bash
+mkcert -install
+```
+  - 在项目根目录生成证书
+```bash
+mkcert localhost
+```
+   - 如果你需要在局域网设备上测试：
+- 使用 mkcert 生成包含IP的证书（IP为局域网内作为服务器的设备的IP）：
+```bash
+mkcert localhost 192.168.1.100
+```
+3. 运行开发服务器：
+```bash
+npm run dev
+```
+
 
 

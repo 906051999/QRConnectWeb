@@ -1,47 +1,28 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import jsQR from 'jsqr';
+import { forwardRef } from 'react';
+
+const ForwardedQRCodeSVG = forwardRef((props, ref) => (
+  <QRCodeSVG {...props} ref={ref} />
+));
 
 export default function WiFiConnector({ ssid, password, encryptionType, isHidden }) {
   const [status, setStatus] = useState('准备连接');
-  const [isConnecting, setIsConnecting] = useState(false);
+  const [scanLog, setScanLog] = useState('');
+  const qrRef = useRef(null);
+  const [qrSvg, setQrSvg] = useState(null);
+
+  useEffect(() => {
+    console.log('Component mounted');
+    setScanLog('组件已加载');
+  }, []);
 
   const wifiString = useMemo(() => (
     `WIFI:T:${encryptionType};S:${ssid};P:${password};H:${isHidden ? 'true' : 'false'};;`
   ), [ssid, password, encryptionType, isHidden]);
-
-  const connectToWiFi = useCallback(async () => {
-    setIsConnecting(true);
-    setStatus('正在连接...');
-
-    try {
-      if ('wifi' in navigator) {
-        await navigator.wifi.requestPermission();
-        const network = await navigator.wifi.connect({
-          ssid,
-          password,
-          encryptionType,
-          hidden: isHidden
-        });
-        setStatus(`已成功连接到 ${network.ssid}`);
-      } else if (/Android/i.test(navigator.userAgent)) {
-        const intent = `intent://androidwifi#Intent;scheme=android-app;package=com.google.android.gms;S.wifi_string=${encodeURIComponent(wifiString)};end`;
-        window.location.href = intent;
-        setStatus('已发送连接请求，请在系统设置中确认');
-      } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        window.location.href = wifiString;
-        setStatus('已打开 WiFi 设置，请手动连接');
-      } else {
-        throw new Error('无法自动连接 WiFi，请手动连接');
-      }
-    } catch (error) {
-      console.error('WiFi 连接失败:', error);
-      setStatus(`连接失败: ${error.message}`);
-    } finally {
-      setIsConnecting(false);
-    }
-  }, [ssid, password, encryptionType, isHidden, wifiString]);
 
   const renderInfoItem = useCallback((label, value) => (
     <div className="flex items-center justify-between">
@@ -49,6 +30,18 @@ export default function WiFiConnector({ ssid, password, encryptionType, isHidden
       <span className="font-medium text-gray-900">{value}</span>
     </div>
   ), []);
+
+  const connectToWifi = useCallback(() => {
+    // 这里我们只能提供指导，无法直接连接
+    setStatus('请手动连接到WiFi');
+    setScanLog(`
+      请按照以下步骤连接WiFi：
+      1. 打开设备的WiFi设置
+      2. 查找并选择名为"${ssid}"的网络
+      3. 输入密码: ${password}
+      4. 点击连接
+    `);
+  }, [ssid, password, setStatus, setScanLog]);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -60,17 +53,22 @@ export default function WiFiConnector({ ssid, password, encryptionType, isHidden
         <div className="text-center text-gray-600">{status}</div>
       </div>
       <div className="mt-6 flex justify-center">
-        <QRCodeSVG value={wifiString} size={200} />
+        <ForwardedQRCodeSVG ref={qrRef} value={wifiString} size={200} />
       </div>
-      <button
-        onClick={connectToWiFi}
-        disabled={isConnecting}
-        className={`w-full mt-6 ${
-          isConnecting ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
-        } text-white font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
-      >
-        {isConnecting ? '连接中...' : '连接 WiFi'}
-      </button>
+      <div className="mt-6 space-y-4">
+        <button
+          onClick={connectToWifi}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          连接到这个WiFi
+        </button>
+        <p className="text-sm text-gray-600 text-center">
+          或使用其他设备扫描上方的二维码
+        </p>
+      </div>
+      <div className="mt-4 p-2 bg-gray-100 rounded-lg">
+        <pre className="text-sm text-gray-700 whitespace-pre-wrap">{scanLog}</pre>
+      </div>
     </div>
   );
 }
