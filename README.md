@@ -1,5 +1,7 @@
 # QRConnectWeb
-> 暂时无法实现扫码跳转网页后自动连接WiFi
+> 浏览器暂时无法实现扫码跳转网页后自动连接WiFi
+> 
+> 微信小程序可以实现：https://developers.weixin.qq.com/miniprogram/dev/api/device/wifi/wx.connectWifi.html
 > 
 QRConnectWeb 不依赖数据库存储信息，通过特殊编码将 WiFi 信息编码到 URL 中，生成对应的二维码，扫描二维码后即可在连接页面中解码获取 WiFi 信息，然后一键自动连接该 WiFi。
 
